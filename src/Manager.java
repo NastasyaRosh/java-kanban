@@ -1,40 +1,25 @@
 import java.util.ArrayList;
 import java.util.HashMap;
 
-/*
-Уточнения по ТЗ смотри в README.md !!!
- */
-
 public class Manager {
+    private int ID = 0;
     HashMap<Integer, Task> tasks = new HashMap<>();
     HashMap<Integer, SubTask> subTasks = new HashMap<>();
     HashMap<Integer, Epic> epics = new HashMap<>();
 
     //Получение списка всех отдельных задач
     public ArrayList getListTasks() {
-        ArrayList<Task> addListTask = new ArrayList<>();
-        for (Task task : tasks.values()) {
-            addListTask.add(task);
-        }
-        return addListTask;
+        return new ArrayList<>(tasks.values());
     }
 
     //Получение списка всех подзадач
     public ArrayList getListSubtasks() {
-        ArrayList<SubTask> addListSubtask = new ArrayList<>();
-        for (SubTask subTask : subTasks.values()) {
-            addListSubtask.add(subTask);
-        }
-        return addListSubtask;
+        return new ArrayList<>(subTasks.values());
     }
 
     //Получение списка всех эпиков
     public ArrayList getListEpics() {
-        ArrayList<Epic> addListEpic = new ArrayList<>();
-        for (Epic epic : epics.values()) {
-            addListEpic.add(epic);
-        }
-        return addListEpic;
+        return new ArrayList<>(epics.values());
     }
 
     //Удаление всех задач
@@ -48,6 +33,7 @@ public class Manager {
         for (Epic epic : epics.values()) {
             epic.idSubtasks.clear();
         }
+        setStatusForEpics();
     }
 
     //Удаление всех эпиков и подзадач (т.к. подзадача не может существовать без эпика)
@@ -75,19 +61,25 @@ public class Manager {
     }
 
     //Создать задачу, эпик или подзадачу
+    /* Из-за использования наследования, оператор instanceof работает некорректно, выдавая всегда true в первом сравнении с классом Task.
+       Поэтому решила оставить старую реализацию. Но зато изучила новый оператор :) */
     public void makeTask(Object obj) {
         if (obj.getClass() == Task.class) {
             Task task = (Task) obj;
+            task.id = ++ID;
             tasks.put(task.getId(task), task);
         } else if (obj.getClass() == Epic.class) {
             Epic epic = (Epic) obj;
+            epic.id = ++ID;
             epics.put(epic.getId(epic), epic);
         } else if (obj.getClass() == SubTask.class) {
             SubTask subTask = (SubTask) obj;
+            subTask.id = ++ID;
             subTasks.put(subTask.getId(subTask), subTask);
             Epic epic = epics.get(subTask.idEpic);
             epic.idSubtasks.add(subTask.getId(subTask));
         }
+        setStatusForEpics();
     }
 
     //Обновить задачу, эпик или подзадачу
@@ -102,6 +94,7 @@ public class Manager {
             SubTask subTask = (SubTask) obj;
             subTasks.put(subTask.getId(subTask), subTask);
         }
+        setStatusForEpics();
     }
 
     //Удалить задачу по ИД
@@ -114,6 +107,7 @@ public class Manager {
         Object delId = id;
         epics.get(subTasks.get(id).idEpic).idSubtasks.remove(delId);
         subTasks.remove(id);
+        setStatusForEpics();
     }
 
     //Удалить эпик и все его подзадачи по ИД

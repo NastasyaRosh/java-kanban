@@ -1,10 +1,11 @@
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class Epic extends Task {
-    ArrayList<Integer> idSubtasks;
+    protected ArrayList<Integer> idSubtasks;
 
-    public Epic(String name, String description, int id) {
-        super(name, description, id);
+    public Epic(String name, String description) {
+        super(name, description);
         this.status = "NEW";
         idSubtasks = new ArrayList<>();
     }
@@ -18,5 +19,22 @@ public class Epic extends Task {
                 ", id=" + id +
                 ", status='" + status + '\'' +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Epic epic = (Epic) o;
+        return id == epic.id && Objects.equals(name, epic.name) && Objects.equals(description, epic.description) && Objects.equals(idSubtasks, epic.idSubtasks);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, description, id, idSubtasks);
+    }
+
+    public ArrayList<Integer> getIdSubtasks() {
+        return idSubtasks;
     }
 }
