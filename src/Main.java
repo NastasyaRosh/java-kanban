@@ -15,11 +15,11 @@ public class Main {
 
         manager.makeTask(task1);
         manager.makeTask(task2);
-        manager.makeTask(epic1);
-        manager.makeTask(epic2);
-        manager.makeTask(subTask1);
-        manager.makeTask(subTask2);
-        manager.makeTask(subTask3);
+        manager.makeEpic(epic1);
+        manager.makeEpic(epic2);
+        manager.makeSubtask(subTask1);
+        manager.makeSubtask(subTask2);
+        manager.makeSubtask(subTask3);
 
         System.out.println("Список всех отдельных задач:");
         System.out.println(manager.getListTasks());
@@ -33,7 +33,7 @@ public class Main {
         SubTask subTask4 = new SubTask("Джордж Оруэлл \"1984\"", "Художка", "NEW", 6, 3);
 
         manager.updateTask(task3);
-        manager.updateTask(subTask4);
+        manager.updateSubtask(subTask4);
         System.out.println("Задача и подзадача обновлены.\n");
 
         System.out.println("Список всех отдельных задач:");

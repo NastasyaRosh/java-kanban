@@ -26,6 +26,12 @@ public class Task {
         this.id = id;
     }
 
+    public Task(String name, String description, int id) {
+        this.name = name;
+        this.description = description;
+        this.id = id;
+    }
+
     public int getId(Task task) {
         return task.id;
     }
@@ -52,7 +58,7 @@ public class Task {
 
     @Override
     public String toString() {
-        return "Tasks.Task{" +
+        return "Task{" +
                 "name='" + name + '\'' +
                 ", description='" + description + '\'' +
                 ", id=" + id +

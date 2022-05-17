@@ -64,38 +64,42 @@ public class Manager {
         return epics.get(id);
     }
 
-    //Создать задачу, эпик или подзадачу
-    public void makeTask(Object obj) {
-        if (obj instanceof Epic) {
-            Epic epic = (Epic) obj;
-            epic.setId(++ID);
-            epics.put(epic.getId(epic), epic);
-        } else if (obj instanceof SubTask) {
-            SubTask subTask = (SubTask) obj;
-            subTask.setId(++ID);
-            subTasks.put(subTask.getId(subTask), subTask);
-            Epic epic = epics.get(subTask.getIdEpic());
-            epic.getIdSubtasks().add(subTask.getId(subTask));
-        } else if (obj instanceof Task) {
-            Task task = (Task) obj;
-            task.setId(++ID);
-            tasks.put(task.getId(task), task);
-        }
+    //Создать задачу
+    public void makeTask(Task task) {
+        task.setId(++ID);
+        tasks.put(task.getId(task), task);
+    }
+
+    //Создать эпик
+    public void makeEpic(Epic epic) {
+        epic.setId(++ID);
+        epics.put(epic.getId(epic), epic);
+    }
+
+    //Создать подзадачу
+    public void makeSubtask(SubTask subTask) {
+        subTask.setId(++ID);
+        subTasks.put(subTask.getId(subTask), subTask);
+        Epic epic = epics.get(subTask.getIdEpic());
+        epic.getIdSubtasks().add(subTask.getId(subTask));
         setStatusForEpics();
     }
 
-    //Обновить задачу, эпик или подзадачу
-    public void updateTask(Object obj) {
-        if (obj instanceof Epic) {
-            Epic epic = (Epic) obj;
-            epics.put(epic.getId(epic), epic);
-        } else if (obj instanceof SubTask) {
-            SubTask subTask = (SubTask) obj;
-            subTasks.put(subTask.getId(subTask), subTask);
-        } else if (obj instanceof Task) {
-            Task task = (Task) obj;
-            tasks.put(task.getId(task), task);
-        }
+    //Обновить задачу
+    public void updateTask(Task task) {
+        tasks.put(task.getId(task), task);
+    }
+
+    //Обновить эпик
+    public void updateEpic(Epic epic) {
+        epic.setIdSubtasks(epics.get(epic.getId(epic)).getIdSubtasks());
+        epics.put(epic.getId(epic), epic);
+        setStatusForEpics();
+    }
+
+    //Обновить подзадачу
+    public void updateSubtask(SubTask subTask) {
+        subTasks.put(subTask.getId(subTask), subTask);
         setStatusForEpics();
     }
 

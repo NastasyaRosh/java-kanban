@@ -12,13 +12,21 @@ public class Epic extends Task {
         idSubtasks = new ArrayList<>();
     }
 
+    public Epic(String name, String description, int id) {
+        super(name, description, id);
+    }
+
     public ArrayList<Integer> getIdSubtasks() {
         return idSubtasks;
     }
 
+    public void setIdSubtasks(ArrayList<Integer> idSubtasks) {
+        this.idSubtasks = idSubtasks;
+    }
+
     @Override
     public String toString() {
-        return "Tasks.Epic{" +
+        return "Epic{" +
                 "idSubtasks=" + idSubtasks +
                 ", name='" + name + '\'' +
                 ", description='" + description + '\'' +
