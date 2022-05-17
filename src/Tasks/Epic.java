@@ -1,8 +1,10 @@
+package Tasks;
+
 import java.util.ArrayList;
 import java.util.Objects;
 
 public class Epic extends Task {
-    protected ArrayList<Integer> idSubtasks;
+    private ArrayList<Integer> idSubtasks;
 
     public Epic(String name, String description) {
         super(name, description);
@@ -10,9 +12,13 @@ public class Epic extends Task {
         idSubtasks = new ArrayList<>();
     }
 
+    public ArrayList<Integer> getIdSubtasks() {
+        return idSubtasks;
+    }
+
     @Override
     public String toString() {
-        return "Epic{" +
+        return "Tasks.Epic{" +
                 "idSubtasks=" + idSubtasks +
                 ", name='" + name + '\'' +
                 ", description='" + description + '\'' +
@@ -34,7 +40,4 @@ public class Epic extends Task {
         return Objects.hash(name, description, id, idSubtasks);
     }
 
-    public ArrayList<Integer> getIdSubtasks() {
-        return idSubtasks;
-    }
 }

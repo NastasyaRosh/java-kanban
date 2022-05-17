@@ -1,3 +1,5 @@
+package Tasks;
+
 import java.util.Objects;
 
 public class SubTask extends Task {
@@ -13,9 +15,13 @@ public class SubTask extends Task {
         this.idEpic = idEpic;
     }
 
+    public int getIdEpic() {
+        return idEpic;
+    }
+
     @Override
     public String toString() {
-        return "SubTask{" +
+        return "Tasks.SubTask{" +
                 "name='" + name + '\'' +
                 ", description='" + description + '\'' +
                 ", id=" + id +
@@ -38,7 +44,4 @@ public class SubTask extends Task {
         return Objects.hash(name, description, id, status, idEpic);
     }
 
-    public int getIdEpic() {
-        return idEpic;
-    }
 }

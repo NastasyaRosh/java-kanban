@@ -1,11 +1,15 @@
+package Manager;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import Tasks.*;
+
 public class Manager {
     private int ID = 0;
-    HashMap<Integer, Task> tasks = new HashMap<>();
-    HashMap<Integer, SubTask> subTasks = new HashMap<>();
-    HashMap<Integer, Epic> epics = new HashMap<>();
+    private HashMap<Integer, Task> tasks = new HashMap<>();
+    private HashMap<Integer, SubTask> subTasks = new HashMap<>();
+    private HashMap<Integer, Epic> epics = new HashMap<>();
 
     //Получение списка всех отдельных задач
     public ArrayList getListTasks() {
@@ -31,7 +35,7 @@ public class Manager {
     public void deleteAllSubTask() {
         subTasks.clear();
         for (Epic epic : epics.values()) {
-            epic.idSubtasks.clear();
+            epic.getIdSubtasks().clear();
         }
         setStatusForEpics();
     }
@@ -40,7 +44,7 @@ public class Manager {
     public void deleteAllEpicsAndSubTasks() {
         subTasks.clear();
         for (Epic epic : epics.values()) {
-            epic.idSubtasks.clear();
+            epic.getIdSubtasks().clear();
         }
         epics.clear();
     }
@@ -61,38 +65,36 @@ public class Manager {
     }
 
     //Создать задачу, эпик или подзадачу
-    /* Из-за использования наследования, оператор instanceof работает некорректно, выдавая всегда true в первом сравнении с классом Task.
-       Поэтому решила оставить старую реализацию. Но зато изучила новый оператор :) */
     public void makeTask(Object obj) {
-        if (obj.getClass() == Task.class) {
-            Task task = (Task) obj;
-            task.id = ++ID;
-            tasks.put(task.getId(task), task);
-        } else if (obj.getClass() == Epic.class) {
+        if (obj instanceof Epic) {
             Epic epic = (Epic) obj;
-            epic.id = ++ID;
+            epic.setId(++ID);
             epics.put(epic.getId(epic), epic);
-        } else if (obj.getClass() == SubTask.class) {
+        } else if (obj instanceof SubTask) {
             SubTask subTask = (SubTask) obj;
-            subTask.id = ++ID;
+            subTask.setId(++ID);
             subTasks.put(subTask.getId(subTask), subTask);
-            Epic epic = epics.get(subTask.idEpic);
-            epic.idSubtasks.add(subTask.getId(subTask));
+            Epic epic = epics.get(subTask.getIdEpic());
+            epic.getIdSubtasks().add(subTask.getId(subTask));
+        } else if (obj instanceof Task) {
+            Task task = (Task) obj;
+            task.setId(++ID);
+            tasks.put(task.getId(task), task);
         }
         setStatusForEpics();
     }
 
     //Обновить задачу, эпик или подзадачу
     public void updateTask(Object obj) {
-        if (obj.getClass() == Task.class) {
-            Task task = (Task) obj;
-            tasks.put(task.getId(task), task);
-        } else if (obj.getClass() == Epic.class) {
+        if (obj instanceof Epic) {
             Epic epic = (Epic) obj;
             epics.put(epic.getId(epic), epic);
-        } else if (obj.getClass() == SubTask.class) {
+        } else if (obj instanceof SubTask) {
             SubTask subTask = (SubTask) obj;
             subTasks.put(subTask.getId(subTask), subTask);
+        } else if (obj instanceof Task) {
+            Task task = (Task) obj;
+            tasks.put(task.getId(task), task);
         }
         setStatusForEpics();
     }
@@ -105,7 +107,7 @@ public class Manager {
     //Удалить подзадачу по ИД
     public void deleteSubtaskById(int id) {
         Object delId = id;
-        epics.get(subTasks.get(id).idEpic).idSubtasks.remove(delId);
+        epics.get(subTasks.get(id).getIdEpic()).getIdSubtasks().remove(delId);
         subTasks.remove(id);
         setStatusForEpics();
     }
@@ -113,7 +115,7 @@ public class Manager {
     //Удалить эпик и все его подзадачи по ИД
     public void deleteEpicById(int id) {
         Epic epic = epics.get(id);
-        for (int i : epic.idSubtasks) {
+        for (int i : epic.getIdSubtasks()) {
             subTasks.remove(i);
         }
         epics.remove(id);
@@ -123,7 +125,7 @@ public class Manager {
     public ArrayList getListSubtasksByEpic(int id) {
         ArrayList<SubTask> getSubtaskByEpic = new ArrayList<>();
         for (SubTask subTask : subTasks.values()) {
-            if (subTask.idEpic == id) {
+            if (subTask.getIdEpic() == id) {
                 getSubtaskByEpic.add(subTask);
             }
         }
@@ -136,28 +138,26 @@ public class Manager {
             int counterNew = 0;
             int counterDone = 0;
             String subStatus;
-            if (!epic.idSubtasks.isEmpty()) {
-                for (int i = 0; i < epic.idSubtasks.size(); i++) {
-                    subStatus = subTasks.get(epic.idSubtasks.get(i)).status;
+            if (!epic.getIdSubtasks().isEmpty()) {
+                for (int i = 0; i < epic.getIdSubtasks().size(); i++) {
+                    subStatus = subTasks.get(epic.getIdSubtasks().get(i)).getStatus();
                     if (subStatus.equals("NEW")) {
                         counterNew++;
                     } else if (subStatus.equals("DONE")) {
                         counterDone++;
                     }
                 }
-                if (counterNew == epic.idSubtasks.size()) {
-                    epic.status = "NEW";
-                } else if (counterDone == epic.idSubtasks.size()) {
-                    epic.status = "DONE";
+                if (counterNew == epic.getIdSubtasks().size()) {
+                    epic.setStatus("NEW");
+                } else if (counterDone == epic.getIdSubtasks().size()) {
+                    epic.setStatus("DONE");
                 } else {
-                    epic.status = "IN_PROGRESS";
+                    epic.setStatus("IN_PROGRESS");
                 }
             } else {
-                epic.status = "NEW";
+                epic.setStatus("NEW");
             }
         }
     }
 
 }
-
-
