@@ -3,16 +3,17 @@ package Manager;
 import Tasks.Epic;
 import Tasks.SubTask;
 import Tasks.Task;
-import java.util.ArrayList;
+
+import java.util.List;
 
 public interface TaskManager {
 
     //Получение списка задач, подзадач и эпика
-    ArrayList getListTasks();
+    List<Task> getListTasks();
 
-    ArrayList getListSubtasks();
+    List<SubTask> getListSubtasks();
 
-    ArrayList getListEpics();
+    List<Epic> getListEpics();
 
     //Удаление всех задач / подзадач / эпиков и подзадач
     void deleteAllTasks();
@@ -50,12 +51,9 @@ public interface TaskManager {
     void deleteEpicById(int id);
 
     //Получить список всех подзадач эпика по его ИД
-    ArrayList getListSubtasksByEpic(int id);
-
-    //Назначение статуса эпика
-    void setStatusForEpics();
+    List<SubTask> getListSubtasksByEpic(int id);
 
     //Получение истории
-    HistoryManager getHistoryManager();
+    List<Task> getHistoryManager();
 
 }

@@ -22,7 +22,7 @@ public class Main {
         manager.makeSubtask(subTask3);
 
         System.out.println("Задачи записаны. История вызовов:");
-        System.out.println(manager.getHistoryManager().getHistory());
+        System.out.println(manager.getHistoryManager());
 
         Task task3 = new Task("Сходить в магазин", "Купить капусту", Statuses.DONE, 2);
         SubTask subTask4 = new SubTask("Джордж Оруэлл \"1984\"", "Художка", Statuses.NEW, 6, 3);
@@ -30,7 +30,7 @@ public class Main {
         manager.updateTask(task3);
         manager.updateSubtask(subTask4);
         System.out.println("Задача и подзадача обновлены. История вызовов:");
-        System.out.println(manager.getHistoryManager().getHistory());
+        System.out.println(manager.getHistoryManager());
 
         manager.getTaskById(1);
         manager.getTaskById(2);
@@ -43,8 +43,10 @@ public class Main {
         manager.getEpicById(4);
         manager.getSubtaskById(5);
         manager.getSubtaskById(7);
+        manager.getSubtaskById(13);
+
         System.out.println("История после 11 вызовов:");
-        System.out.println(manager.getHistoryManager().getHistory());
+        System.out.println(manager.getHistoryManager());
 
     }
 }
