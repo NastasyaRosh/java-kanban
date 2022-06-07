@@ -1,16 +1,17 @@
-package Manager;
+package manager;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-import Tasks.*;
+import tasks.*;
 
 public class InMemoryTaskManager implements TaskManager {
     private int id = 0;
-    private final HashMap<Integer, Task> tasks = new HashMap<>();
-    private final HashMap<Integer, SubTask> subTasks = new HashMap<>();
-    private final HashMap<Integer, Epic> epics = new HashMap<>();
+    private final Map<Integer, Task> tasks = new HashMap<>();
+    private final Map<Integer, SubTask> subTasks = new HashMap<>();
+    private final Map<Integer, Epic> epics = new HashMap<>();
     private final HistoryManager historyManager = Managers.getDefaultHistory();
 
     //Получение списка всех отдельных задач
@@ -82,44 +83,44 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void makeTask(Task task) {
         task.setId(setCommonId());
-        tasks.put(task.getId(task), task);
+        tasks.put(task.getId(), task);
     }
 
     //Создать эпик
     @Override
     public void makeEpic(Epic epic) {
         epic.setId(setCommonId());
-        epics.put(epic.getId(epic), epic);
+        epics.put(epic.getId(), epic);
     }
 
     //Создать подзадачу
     @Override
     public void makeSubtask(SubTask subTask) {
         subTask.setId(setCommonId());
-        subTasks.put(subTask.getId(subTask), subTask);
+        subTasks.put(subTask.getId(), subTask);
         Epic epic = epics.get(subTask.getIdEpic());
-        epic.getIdSubtasks().add(subTask.getId(subTask));
+        epic.getIdSubtasks().add(subTask.getId());
         setStatusForEpics();
     }
 
     //Обновить задачу
     @Override
     public void updateTask(Task task) {
-        tasks.put(task.getId(task), task);
+        tasks.put(task.getId(), task);
     }
 
     //Обновить эпик
     @Override
     public void updateEpic(Epic epic) {
-        epic.setIdSubtasks(epics.get(epic.getId(epic)).getIdSubtasks());
-        epics.put(epic.getId(epic), epic);
+        epic.setIdSubtasks(epics.get(epic.getId()).getIdSubtasks());
+        epics.put(epic.getId(), epic);
         setStatusForEpics();
     }
 
     //Обновить подзадачу
     @Override
     public void updateSubtask(SubTask subTask) {
-        subTasks.put(subTask.getId(subTask), subTask);
+        subTasks.put(subTask.getId(), subTask);
         setStatusForEpics();
     }
 

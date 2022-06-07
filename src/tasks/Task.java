@@ -1,4 +1,4 @@
-package Tasks;
+package tasks;
 
 import java.util.Objects;
 
@@ -32,8 +32,8 @@ public class Task {
         this.id = id;
     }
 
-    public int getId(Task task) {
-        return task.id;
+    public int getId() {
+        return id;
     }
 
     public String getName() {
