@@ -11,7 +11,7 @@ public class Main {
         Epic epic2 = new Epic("Счета", "На оплату");
         SubTask subTask1 = new SubTask("Карл Маркс \"Капитал\"", "Экономика", Statuses.NEW, 3);
         SubTask subTask2 = new SubTask("Карлос Кастанеда \"Путешествие в Икстлан\"", "Философия", Statuses.IN_PROGRESS, 3);
-        SubTask subTask3 = new SubTask("Счет за газ", "557 рублей", Statuses.DONE, 4);
+        SubTask subTask3 = new SubTask("Счет за газ", "557 рублей", Statuses.DONE, 3);
 
         manager.makeTask(task1);
         manager.makeTask(task2);
@@ -22,14 +22,6 @@ public class Main {
         manager.makeSubtask(subTask3);
 
         System.out.println("Задачи записаны. История вызовов:");
-        System.out.println(manager.getHistoryManager());
-
-        Task task3 = new Task("Сходить в магазин", "Купить капусту", Statuses.DONE, 2);
-        SubTask subTask4 = new SubTask("Джордж Оруэлл \"1984\"", "Художка", Statuses.NEW, 6, 3);
-
-        manager.updateTask(task3);
-        manager.updateSubtask(subTask4);
-        System.out.println("Задача и подзадача обновлены. История вызовов:");
         System.out.println(manager.getHistoryManager());
 
         manager.getTaskById(1);
@@ -43,9 +35,14 @@ public class Main {
         manager.getEpicById(4);
         manager.getSubtaskById(5);
         manager.getSubtaskById(7);
-        manager.getSubtaskById(13);
 
         System.out.println("История после 11 вызовов:");
+        System.out.println(manager.getHistoryManager());
+
+        manager.deleteTaskById(1);
+        manager.deleteEpicById(3);
+
+        System.out.println("История после удаления задачи и эпика:");
         System.out.println(manager.getHistoryManager());
 
     }
