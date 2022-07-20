@@ -1,5 +1,7 @@
 package tasks;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 
 public class Task {
@@ -7,11 +9,35 @@ public class Task {
     protected String description;
     protected int id;
     protected Statuses status;
+    protected Integer duration;
+    protected LocalDateTime startTime;
 
     public Task(String name, String description, Statuses status) {
         this.name = name;
         this.description = description;
         this.status = status;
+    }
+
+    public Task(String name, String description, Statuses status, int duration, LocalDateTime startTime) {
+        this.name = name;
+        this.description = description;
+        this.status = status;
+        this.duration = duration;
+        this.startTime = startTime;
+    }
+
+    public Task(String name, String description, Statuses status, int id, String duration, String startTime) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.status = status;
+        if (!duration.equals("null")) {
+            this.duration = Integer.parseInt(duration);
+        } else this.duration = null;
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm|dd.MM.yyyy");
+        if (!startTime.equals("null")) {
+            this.startTime = LocalDateTime.parse(startTime, formatter);
+        } else this.startTime = null;
     }
 
     protected Task(String name, String description) {
@@ -56,6 +82,25 @@ public class Task {
         this.status = status;
     }
 
+    public LocalDateTime getEndTime() {
+        return startTime.plusMinutes(duration);
+    }
+
+    public LocalDateTime getStartTime() {
+        return startTime;
+    }
+
+    public String getStartTimeFormat() {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm|dd.MM.yyyy");
+        if (startTime != null) {
+            return startTime.format(formatter);
+        } else return null;
+    }
+
+    public Integer getDuration() {
+        return duration;
+    }
+
     @Override
     public String toString() {
         return "Task{" +
@@ -63,6 +108,8 @@ public class Task {
                 ", description='" + description + '\'' +
                 ", id=" + id +
                 ", status='" + status + '\'' +
+                ", duration='" + duration + '\'' +
+                ", startTime='" + getStartTimeFormat() + '\'' +
                 '}';
     }
 
