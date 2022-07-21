@@ -2,6 +2,7 @@ package tests;
 
 import manager.HistoryManager;
 import manager.InMemoryHistoryManager;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import tasks.Statuses;
 import tasks.Task;
@@ -13,10 +14,19 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class HistoryManagerTest {
 
-    HistoryManager historyManager = new InMemoryHistoryManager();
-    Task task = new Task("Помыть пол", "Используй Mister Proper", Statuses.NEW, 1);
-    Task task2 = new Task("Сходить в магазин", "Купить капусту", Statuses.IN_PROGRESS, 2);
-    Task task3 = new Task("Сдать спринт", "Дописать тесты", Statuses.IN_PROGRESS, 3);
+    HistoryManager historyManager;
+    Task task;
+    Task task2;
+    Task task3;
+
+    @BeforeEach
+    public void beforeEach() {
+        historyManager = new InMemoryHistoryManager();
+        task = new Task("Помыть пол", "Используй Mister Proper", Statuses.NEW, 1);
+        task2 = new Task("Сходить в магазин", "Купить капусту", Statuses.IN_PROGRESS, 2);
+        task3 = new Task("Сдать спринт", "Дописать тесты", Statuses.IN_PROGRESS, 3);
+    }
+
 
     @Test
     public void add() {
@@ -53,5 +63,16 @@ public class HistoryManagerTest {
         array.add(task);
         array.add(task2);
         assertArrayEquals(array.toArray(), historyManager.getHistory().toArray(), "Ошибка при удалении конечного элемента.");
+    }
+
+    @Test
+    public void getHistoryTest() {
+
+        assertArrayEquals(new ArrayList<>().toArray(), historyManager.getHistory().toArray(), "Пустая история не возвращается.");
+
+        historyManager.add(task);
+        List<Task> list = new ArrayList<>();
+        list.add(task);
+        assertArrayEquals(list.toArray(), historyManager.getHistory().toArray(), "Заполненная история не возвращается.");
     }
 }

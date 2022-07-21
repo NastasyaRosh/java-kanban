@@ -47,12 +47,18 @@ public class InMemoryTaskManager implements TaskManager {
     //Удаление всех задач
     @Override
     public void deleteAllTasks() {
+        for (Task task : tasks.values()) {
+            deleteFromPriorityList(task);
+        }
         tasks.clear();
     }
 
     //Удаление всех подзадач
     @Override
     public void deleteAllSubTask() {
+        for (SubTask subTask : subTasks.values()) {
+            deleteFromPriorityList(subTask);
+        }
         subTasks.clear();
         for (Epic epic : epics.values()) {
             epic.getIdSubtasks().clear();
@@ -66,6 +72,9 @@ public class InMemoryTaskManager implements TaskManager {
     //Удаление всех эпиков и подзадач (т.к. подзадача не может существовать без эпика)
     @Override
     public void deleteAllEpicsAndSubTasks() {
+        for (SubTask subTask : subTasks.values()) {
+            deleteFromPriorityList(subTask);
+        }
         subTasks.clear();
         for (Epic epic : epics.values()) {
             epic.getIdSubtasks().clear();
@@ -99,6 +108,7 @@ public class InMemoryTaskManager implements TaskManager {
     public void makeTask(Task task) {
         task.setId(setCommonId());
         tasks.put(task.getId(), task);
+        setPriorityForTasks(task);
         validatorTimeTasks(task);
     }
 
@@ -118,14 +128,17 @@ public class InMemoryTaskManager implements TaskManager {
         epic.getIdSubtasks().add(subTask.getId());
         setStatusForEpics();
         setTimeAndDurationForEpic();
+        setPriorityForTasks(subTask);
         validatorTimeTasks(subTask);
     }
 
     //Обновить задачу
     @Override
     public void updateTask(Task task) {
+        deleteFromPriorityList(tasks.get(task.getId()));
         tasks.put(task.getId(), task);
         validatorTimeTasks(task);
+        setPriorityForTasks(task);
     }
 
     //Обновить эпик
@@ -140,15 +153,18 @@ public class InMemoryTaskManager implements TaskManager {
     //Обновить подзадачу
     @Override
     public void updateSubtask(SubTask subTask) {
+        deleteFromPriorityList(subTasks.get(subTask.getId()));
         subTasks.put(subTask.getId(), subTask);
         setStatusForEpics();
         setTimeAndDurationForEpic();
+        setPriorityForTasks(subTask);
         validatorTimeTasks(subTask);
     }
 
     //Удалить задачу по ИД
     @Override
     public void deleteTaskById(int id) {
+        deleteFromPriorityList(tasks.get(id));
         tasks.remove(id);
         historyManager.remove(id);
     }
@@ -156,6 +172,7 @@ public class InMemoryTaskManager implements TaskManager {
     //Удалить подзадачу по ИД
     @Override
     public void deleteSubtaskById(int id) {
+        deleteFromPriorityList(subTasks.get(id));
         Object delId = id;
         epics.get(subTasks.get(id).getIdEpic()).getIdSubtasks().remove(delId);
         subTasks.remove(id);
@@ -169,6 +186,7 @@ public class InMemoryTaskManager implements TaskManager {
     public void deleteEpicById(int id) {
         Epic epic = epics.get(id);
         for (int i : epic.getIdSubtasks()) {
+            deleteFromPriorityList(subTasks.get(i));
             subTasks.remove(i);
             historyManager.remove(i);
         }
@@ -260,32 +278,29 @@ public class InMemoryTaskManager implements TaskManager {
         return historyManager;
     }
 
-    private void setPriorityForTasks() {
-        for (Task task : tasks.values()) {
-            if (task.getStartTime() != null) {
-                priorityTasks.add(task);
-            } else {
-                notPriorityTasks.add(task);
-            }
+    protected void setPriorityForTasks(Task task) {
+        if (task.getStartTime() != null) {
+            priorityTasks.add(task);
+        } else {
+            notPriorityTasks.add(task);
         }
-        for (SubTask subTask : subTasks.values()) {
-            if (subTask.getStartTime() != null) {
-                priorityTasks.add(subTask);
-            } else {
-                notPriorityTasks.add(subTask);
-            }
+    }
+
+    private void deleteFromPriorityList(Task task) {
+        if (task.getStartTime() != null) {
+            priorityTasks.remove(task);
+        } else {
+            notPriorityTasks.remove(task);
         }
     }
 
     public List<Task> getPrioritizedTasks() {
-        setPriorityForTasks();
         List<Task> prioritisedList = new ArrayList<>(priorityTasks);
         prioritisedList.addAll(notPriorityTasks);
         return prioritisedList;
     }
 
     protected void validatorTimeTasks(Task task) {
-        setPriorityForTasks();
         for (Task priorityTask : priorityTasks) {
             if (task.getStartTime() != null) {
                 if (task.getId() != priorityTask.getId()) {

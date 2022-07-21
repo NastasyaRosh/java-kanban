@@ -24,7 +24,7 @@ public class Main {
         fileTasksManager.getTaskById(1);
         fileTasksManager.getEpicById(2);
 
-        FileBackedTasksManager fileBackedTasksManager = fileTasksManager.loadFromFile("task.csv");
+        FileBackedTasksManager fileBackedTasksManager = FileBackedTasksManager.loadFromFile("task.csv");
         fileBackedTasksManager.makeSubtask(subTask2);
         fileBackedTasksManager.makeTask(task2);
         System.out.println(fileBackedTasksManager.getPrioritizedTasks());

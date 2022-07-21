@@ -49,7 +49,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         }
     }
 
-    public FileBackedTasksManager loadFromFile(String fileName) {
+    public static FileBackedTasksManager loadFromFile(String fileName) {
         FileBackedTasksManager taskManager;
         try {
             String read = Files.readString(Path.of(fileName));
@@ -173,6 +173,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         task.setId(setCommonId());
         tasks.put(task.getId(), task);
         super.validatorTimeTasks(task);
+        super.setPriorityForTasks(task);
         save();
     }
 
@@ -191,6 +192,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         epic.getIdSubtasks().add(subTask.getId());
         super.setStatusForEpics();
         super.setTimeAndDurationForEpic();
+        super.setPriorityForTasks(subTask);
         super.validatorTimeTasks(subTask);
         save();
     }
@@ -276,6 +278,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
 
     private void saveTask(Task task) {
         tasks.put(task.getId(), task);
+        setPriorityForTasks(task);
     }
 
     private void saveEpic(Task task) {
@@ -291,6 +294,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         ArrayList<Integer> idSubtasks = new ArrayList<>();
         idSubtasks.add(subTask.getId());
         epic.setIdSubtasks(idSubtasks);
+        setPriorityForTasks(task);
     }
 
 }

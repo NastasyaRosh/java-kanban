@@ -195,13 +195,14 @@ abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
-    public void getPrioritizedTasksTest() {
+    public void getPrioritizedTasksTestForMakeAndDeleteById() {
         Epic epic = new Epic("Счета", "На оплату");
         SubTask subTask1 = new SubTask("Счет за воду", "2222 рубля", Statuses.NEW, 1);
         SubTask subTask2 = new SubTask("Счет за газ", "557 рублей", Statuses.IN_PROGRESS, 1
                 , 120, LocalDateTime.of(2022, 10, 5, 10, 30));
         SubTask subTask3 = new SubTask("Счет за воду", "2222 рубля", Statuses.NEW, 1
                 , 30, LocalDateTime.of(2022, 4, 25, 10, 0));
+        Task task = new Task("Сходить в магазин", "Купить капусту", Statuses.IN_PROGRESS);
 
         taskManager.makeEpic(epic);
         taskManager.makeSubtask(subTask1);
@@ -212,6 +213,79 @@ abstract class TaskManagerTest<T extends TaskManager> {
         list.add(subTask3);
         list.add(subTask2);
         list.add(subTask1);
+        assertArrayEquals(list.toArray(), taskManager.getPrioritizedTasks().toArray());
+
+        taskManager.deleteSubtaskById(2);
+        list.remove(2);
+        assertArrayEquals(list.toArray(), taskManager.getPrioritizedTasks().toArray());
+
+        taskManager.makeTask(task);
+        taskManager.deleteEpicById(1);
+        list.clear();
+        list.add(task);
+        assertArrayEquals(list.toArray(), taskManager.getPrioritizedTasks().toArray());
+
+        taskManager.deleteTaskById(5);
+        list.clear();
+        assertArrayEquals(list.toArray(), taskManager.getPrioritizedTasks().toArray());
+
+    }
+
+    @Test
+    public void getPrioritizedTasksTestForDeleteAll() {
+        Epic epic = new Epic("Счета", "На оплату");
+        SubTask subTask1 = new SubTask("Счет за воду", "2222 рубля", Statuses.NEW, 1);
+        SubTask subTask2 = new SubTask("Счет за газ", "557 рублей", Statuses.IN_PROGRESS, 1
+                , 120, LocalDateTime.of(2022, 10, 5, 10, 30));
+        SubTask subTask3 = new SubTask("Счет за воду", "2222 рубля", Statuses.NEW, 1
+                , 30, LocalDateTime.of(2022, 4, 25, 10, 0));
+        Task task = new Task("Сходить в магазин", "Купить капусту", Statuses.IN_PROGRESS);
+
+        taskManager.makeEpic(epic);
+        taskManager.makeSubtask(subTask1);
+        taskManager.makeSubtask(subTask2);
+        taskManager.makeTask(task);
+        List<Task> list = new ArrayList<>();
+        list.add(subTask2);
+        list.add(subTask1);
+
+        taskManager.deleteAllTasks();
+        assertArrayEquals(list.toArray(), taskManager.getPrioritizedTasks().toArray());
+
+        taskManager.deleteAllSubTask();
+        list.clear();
+        assertArrayEquals(list.toArray(), taskManager.getPrioritizedTasks().toArray());
+
+        taskManager.makeSubtask(subTask3);
+        taskManager.deleteAllEpicsAndSubTasks();
+        assertArrayEquals(list.toArray(), taskManager.getPrioritizedTasks().toArray());
+    }
+
+    @Test
+    public void getPrioritizedTasksTestForUpdateTask() {
+        Task task = new Task("Сходить в магазин", "Купить капусту", Statuses.IN_PROGRESS,
+                30, LocalDateTime.of(2022, 4, 25, 10, 0));
+        Task task2 = new Task("Обновление", "Новый вариант без времени", Statuses.DONE, 1);
+
+        taskManager.makeTask(task);
+        taskManager.updateTask(task2);
+        List<Task> list = new ArrayList<>();
+        list.add(task2);
+        assertArrayEquals(list.toArray(), taskManager.getPrioritizedTasks().toArray());
+    }
+
+    @Test
+    public void getPrioritizedTasksTestForUpdateSubtask() {
+        Epic epic = new Epic("Счета", "На оплату");
+        SubTask subTask1 = new SubTask("Счет за воду", "2222 рубля", Statuses.NEW, 1
+                , 120, LocalDateTime.of(2022, 10, 5, 10, 30));
+        SubTask subTask2 = new SubTask("Счет за газ", "557 рублей", Statuses.IN_PROGRESS, 2, 1);
+
+        taskManager.makeEpic(epic);
+        taskManager.makeSubtask(subTask1);
+        taskManager.updateSubtask(subTask2);
+        List<Task> list = new ArrayList<>();
+        list.add(subTask2);
         assertArrayEquals(list.toArray(), taskManager.getPrioritizedTasks().toArray());
     }
 
