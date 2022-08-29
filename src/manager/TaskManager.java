@@ -1,5 +1,6 @@
 package manager;
 
+import com.google.gson.JsonObject;
 import tasks.Epic;
 import tasks.SubTask;
 import tasks.Task;
@@ -58,5 +59,11 @@ public interface TaskManager {
 
     //Получение отсортированного по времени начала списка задач
     List<Task> getPrioritizedTasks();
+
+    //Преобразование задачи в объект из JSON
+    Task taskFromJSON(JsonObject jsonObject);
+
+    //Преобразование эпика в объект из JSON
+    Epic epicFromJSON(JsonObject jsonObject);
 
 }

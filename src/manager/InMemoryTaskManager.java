@@ -3,6 +3,7 @@ package manager;
 import java.time.LocalDateTime;
 import java.util.*;
 
+import com.google.gson.JsonObject;
 import tasks.*;
 
 public class InMemoryTaskManager implements TaskManager {
@@ -19,10 +20,10 @@ public class InMemoryTaskManager implements TaskManager {
     };
 
     protected int id = 0;
-    protected final Map<Integer, Task> tasks = new HashMap<>();
-    protected final Map<Integer, SubTask> subTasks = new HashMap<>();
-    protected final Map<Integer, Epic> epics = new HashMap<>();
-    public final HistoryManager historyManager = Managers.getDefaultHistory();
+    protected Map<Integer, Task> tasks = new HashMap<>();
+    protected Map<Integer, SubTask> subTasks = new HashMap<>();
+    protected Map<Integer, Epic> epics = new HashMap<>();
+    public HistoryManager historyManager = Managers.getDefaultHistory();
     protected Set<Task> priorityTasks = new TreeSet<>(comparator);
     protected Set<Task> notPriorityTasks = new HashSet<>();
 
@@ -300,12 +301,56 @@ public class InMemoryTaskManager implements TaskManager {
         return prioritisedList;
     }
 
+    @Override
+    public Task taskFromJSON(JsonObject jsonObject) {
+        Task task = null;
+        String name = jsonObject.get("name").getAsString();
+        String description = jsonObject.get("description").getAsString();
+        int id = jsonObject.get("id").getAsInt();
+        Statuses status = Statuses.valueOf(jsonObject.get("status").getAsString());
+            if (jsonObject.has("duration") && jsonObject.has("startTime")) {
+                String duration = jsonObject.get("duration").getAsString();
+                JsonObject startDate = jsonObject.get("startTime").getAsJsonObject().get("date").getAsJsonObject();
+                JsonObject startTime = jsonObject.get("startTime").getAsJsonObject().get("time").getAsJsonObject();
+                int year = startDate.get("year").getAsInt();
+                int month = startDate.get("month").getAsInt();
+                int day = startDate.get("day").getAsInt();
+                int hour = startTime.get("hour").getAsInt();
+                int minute = startTime.get("minute").getAsInt();
+                String startDateTime = String.format("%02d:%02d|%02d.%02d.%04d", hour, minute, day, month, year);
+                if (jsonObject.has("idEpic")) {
+                    int idEpic = jsonObject.get("idEpic").getAsInt();
+                    return new SubTask(name, description, status, id, idEpic, duration, startDateTime);
+                } else {
+                    task = new Task(name, description, status, id, duration, startDateTime);
+                    return task;
+                }
+            } else {
+                if (jsonObject.has("idEpic")) {
+                    int idEpic = jsonObject.get("idEpic").getAsInt();
+                    return new SubTask(name, description, status, id, idEpic);
+                } else {
+                    task = new Task(name, description, status, id);
+                    return task;
+                }
+            }
+    }
+
+    @Override
+    public Epic epicFromJSON(JsonObject jsonObject) {
+        String name = jsonObject.get("name").getAsString();
+        String description = jsonObject.get("description").getAsString();
+        int id = jsonObject.get("id").getAsInt();
+        return new Epic(name, description, id);
+    }
+
     protected void validatorTimeTasks(Task task) {
         for (Task priorityTask : priorityTasks) {
             if (task.getStartTime() != null) {
                 if (task.getId() != priorityTask.getId()) {
                     if (!task.getStartTime().isBefore(priorityTask.getStartTime()) && !task.getStartTime().isAfter(priorityTask.getEndTime()) ||
                             !priorityTask.getStartTime().isBefore(task.getStartTime()) && !priorityTask.getStartTime().isAfter(task.getEndTime())) {
+                        System.out.println("Невозможно создать задачу, так как выбранное время уже занято.");
                         throw new IllegalArgumentException("Даты пересекаются у задач с номерами: " + priorityTask.getId() + " и " + task.getId());
                     }
                 }

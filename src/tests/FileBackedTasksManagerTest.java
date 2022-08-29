@@ -7,6 +7,7 @@ import tasks.Epic;
 import tasks.Statuses;
 import tasks.SubTask;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -21,7 +22,7 @@ public class FileBackedTasksManagerTest extends TaskManagerTest<FileBackedTasksM
     }
 
     @Test
-    public void saveAndLoad() {
+    public void saveAndLoad() throws IOException, InterruptedException {
         taskManager.deleteAllTasks();
         FileBackedTasksManager loadTaskManager = taskManager.loadFromFile(fileName);
         assertArrayEquals(new ArrayList<>().toArray(), loadTaskManager.getListTasks().toArray(), "Файл не пустой.");
