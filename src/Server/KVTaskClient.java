@@ -1,8 +1,6 @@
 package Server;
 
 import com.google.gson.*;
-import manager.InMemoryTaskManager;
-import tasks.Task;
 
 import java.io.IOException;
 import java.net.URI;
@@ -30,7 +28,7 @@ public class KVTaskClient {
         }
     }
 
-    public void put(String key, String json){
+    public void put(String key, String json) {
         this.key = key;
         URI urlSave = URI.create(url + "/save/" + key + "?API_TOKEN=" + apiToken);
         HttpRequest request = HttpRequest.newBuilder().uri(urlSave).POST(HttpRequest.BodyPublishers.ofString(json)).build();
@@ -47,11 +45,7 @@ public class KVTaskClient {
         HttpRequest request = HttpRequest.newBuilder().uri(urlLoad).GET().build();
         try {
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-            JsonElement jsonElement = JsonParser.parseString(response.body());
-            Gson gson = new GsonBuilder().serializeNulls().create();
-            //Тут не считывается таска при загрузке с сервера
-            Task task = gson.fromJson(jsonElement, Task.class);
-            responseLoad = gson.toJson(task).toString();
+            responseLoad = response.body();
         } catch (IOException | InterruptedException e) {
             System.out.println("Во время выполнения запроса на загрузку возникла ошибка.");
         }

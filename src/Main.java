@@ -1,12 +1,9 @@
 import Server.HttpTaskServer;
 import Server.KVServer;
-import Server.KVTaskClient;
-import com.google.gson.Gson;
 import manager.*;
 import tasks.*;
 
 import java.io.IOException;
-import java.net.URI;
 import java.time.LocalDateTime;
 
 public class Main {
@@ -33,8 +30,6 @@ public class Main {
 
         httpManager.getTaskById(1);
         httpManager.getEpicById(3);
-
-        System.out.println(httpManager.getPrioritizedTasks());
 
         HttpTaskServer server = new HttpTaskServer();
 

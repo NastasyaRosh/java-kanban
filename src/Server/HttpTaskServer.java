@@ -16,7 +16,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
-import java.net.URI;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
@@ -29,10 +28,7 @@ public class HttpTaskServer {
     private static final Charset DEFAULT_CHARSET = StandardCharsets.UTF_8;
 
     public HttpTaskServer() throws IOException {
-        //Через файлменеджер работает (следующая строчка)
-        //this.taskManager = FileBackedTasksManager.loadFromFile("task.csv");
         this.taskManager = HTTPTaskManager.load();
-        //this.taskManager = Managers.getDefault();
         httpServer = HttpServer.create();
         httpServer.bind(new InetSocketAddress(port), 0);
 
@@ -119,7 +115,7 @@ public class HttpTaskServer {
                                 response = "Задача обновлена.";
                             } else {
                                 exchange.sendResponseHeaders(201, 0);
-                                taskManager.makeTask(task);
+                                ((HTTPTaskManager) taskManager).makeTaskWithId(task);
                                 response = "Задача создана.";
                             }
                         }
@@ -197,7 +193,7 @@ public class HttpTaskServer {
                                 response = "Подзадача обновлена.";
                             } else {
                                 exchange.sendResponseHeaders(201, 0);
-                                taskManager.makeSubtask(subTask);
+                                ((HTTPTaskManager) taskManager).makeSubtaskWithId(subTask);
                                 response = "Подзадача создана.";
                             }
                         }
@@ -271,7 +267,7 @@ public class HttpTaskServer {
                                 response = "Эпик обновлен.";
                             } else {
                                 exchange.sendResponseHeaders(201, 0);
-                                taskManager.makeEpic(epic);
+                                ((HTTPTaskManager) taskManager).makeEpicWithId(epic);
                                 response = "Эпик создан.";
                             }
                         }

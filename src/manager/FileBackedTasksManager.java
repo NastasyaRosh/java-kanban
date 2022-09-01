@@ -17,7 +17,7 @@ import static tasks.TasksType.*;
 public class FileBackedTasksManager extends InMemoryTaskManager {
 
     private final String fileName;
-    protected int id = 0;
+    private int id = 0;
 
     public FileBackedTasksManager(String fileName) {
         this.fileName = fileName;
