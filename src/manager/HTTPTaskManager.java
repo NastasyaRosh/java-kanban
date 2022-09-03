@@ -45,11 +45,13 @@ public class HTTPTaskManager extends FileBackedTasksManager {
         }.getType());
 
         String jsonHistory = httpTaskManager.client.load("history");
-        if (!jsonHistory.isEmpty()) {
-            ArrayList<Task> history = gson.fromJson(jsonHistory, new TypeToken<ArrayList<Task>>() {
-            }.getType());
-            for (Task task : history) {
-                httpTaskManager.historyManager.add(task);
+        if (httpTaskManager.priorityTasks != null) {
+            if (!jsonHistory.isEmpty()) {
+                ArrayList<Task> history = gson.fromJson(jsonHistory, new TypeToken<ArrayList<Task>>() {
+                }.getType());
+                for (Task task : history) {
+                    httpTaskManager.historyManager.add(task);
+                }
             }
         }
         return httpTaskManager;

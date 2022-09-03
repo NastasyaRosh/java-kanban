@@ -16,21 +16,35 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
+import java.net.URI;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
 public class HttpTaskServer {
 
-    private final HttpServer httpServer;
+    private HttpServer httpServer;
     private static TaskManager taskManager;
     private final int port = 8080;
     private static final Gson gson = new Gson();
     private static final Charset DEFAULT_CHARSET = StandardCharsets.UTF_8;
 
-    public HttpTaskServer() throws IOException {
+    public HttpTaskServer(String url) {
+        this.taskManager = new HTTPTaskManager(URI.create(url));
+        start();
+    }
+
+    public HttpTaskServer() {
         this.taskManager = HTTPTaskManager.load();
-        httpServer = HttpServer.create();
-        httpServer.bind(new InetSocketAddress(port), 0);
+        start();
+    }
+
+    private void start() {
+        try {
+            httpServer = HttpServer.create();
+            httpServer.bind(new InetSocketAddress(port), 0);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         httpServer.createContext("/tasks/", new PrioritizedTasksHandler());
         httpServer.createContext("/tasks/task", new TaskHandler());
@@ -44,6 +58,10 @@ public class HttpTaskServer {
 
         httpServer.start();
         System.out.println("Сервер запущен.");
+    }
+
+    public void stop(int i) {
+        httpServer.stop(i);
     }
 
     static class PrioritizedTasksHandler implements HttpHandler {
