@@ -1,4 +1,4 @@
-package handlers;
+package server.handlers;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
@@ -8,7 +8,7 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import manager.HTTPTaskManager;
 import manager.TaskManager;
-import tasks.Task;
+import tasks.Epic;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -16,13 +16,13 @@ import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
-public class TaskHandler implements HttpHandler {
+public class EpicHandler implements HttpHandler {
 
     private static final Gson gson = new Gson();
     private static final Charset DEFAULT_CHARSET = StandardCharsets.UTF_8;
     private final TaskManager taskManager;
 
-    public TaskHandler(TaskManager taskManager) {
+    public EpicHandler(TaskManager taskManager) {
         this.taskManager = taskManager;
     }
 
@@ -36,19 +36,19 @@ public class TaskHandler implements HttpHandler {
 
         switch (method) {
             case "GET":
-                if (path.endsWith("/tasks/task")) {
+                if (path.endsWith("/tasks/epic")) {
                     exchange.sendResponseHeaders(200, 0);
-                    response = gson.toJson(taskManager.getListTasks());
-                } else if (path.contains("/tasks/task?id=")) {
+                    response = gson.toJson(taskManager.getListEpics());
+                } else if (path.contains("/tasks/epic?id=")) {
                     exchange.sendResponseHeaders(200, 0);
                     int id = Integer.parseInt(path.substring(path.indexOf("?id=") + 4));
-                    response = gson.toJson(taskManager.getTaskById(id));
+                    response = gson.toJson(taskManager.getEpicById(id));
                 }
                 break;
             case "POST":
-                if (path.equals("/tasks/task")) {
+                if (path.equals("/tasks/epic")) {
                     try (InputStream inputStream = exchange.getRequestBody()) {
-                        Task task = null;
+                        Epic epic = null;
                         String body = new String(inputStream.readAllBytes(), DEFAULT_CHARSET);
                         JsonElement jsonElement = JsonParser.parseString(body);
                         if (!jsonElement.isJsonObject()) {
@@ -56,11 +56,11 @@ public class TaskHandler implements HttpHandler {
                             return;
                         }
                         JsonObject jsonObject = jsonElement.getAsJsonObject();
-                        task = taskManager.taskFromJSON(jsonObject);
+                        epic = taskManager.epicFromJSON(jsonObject);
 
                         int i = -1;
-                        for (Task listTask : taskManager.getPrioritizedTasks()) {
-                            if (listTask.getId() == task.getId()) {
+                        for (Epic listEpic : taskManager.getListEpics()) {
+                            if (listEpic.getId() == epic.getId()) {
                                 i = 1;
                                 break;
                             }
@@ -68,26 +68,26 @@ public class TaskHandler implements HttpHandler {
 
                         if (i > 0) {
                             exchange.sendResponseHeaders(201, 0);
-                            taskManager.updateTask(task);
-                            response = "Задача обновлена.";
+                            taskManager.updateEpic(epic);
+                            response = "Эпик обновлен.";
                         } else {
                             exchange.sendResponseHeaders(201, 0);
-                            ((HTTPTaskManager) taskManager).makeTaskWithId(task);
-                            response = "Задача создана.";
+                            ((HTTPTaskManager) taskManager).makeEpicWithId(epic);
+                            response = "Эпик создан.";
                         }
                     }
                 }
                 break;
             case "DELETE":
-                if (path.endsWith("/tasks/task")) {
+                if (path.endsWith("/tasks/epic")) {
                     exchange.sendResponseHeaders(200, 0);
-                    taskManager.deleteAllTasks();
-                    response = "Все задачи удалены.";
-                } else if (path.contains("/tasks/task?id=")) {
+                    taskManager.deleteAllEpicsAndSubTasks();
+                    response = "Все эпики и подзадачи удалены.";
+                } else if (path.contains("/tasks/epic?id=")) {
                     exchange.sendResponseHeaders(200, 0);
                     int id = Integer.parseInt(path.substring(path.indexOf("?id=") + 4));
-                    taskManager.deleteTaskById(id);
-                    response = "Задача с ID = " + id + " удалена.";
+                    taskManager.deleteEpicById(id);
+                    response = "Эпик с ID = " + id + " удален.";
                 }
                 break;
         }

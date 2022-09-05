@@ -1,4 +1,4 @@
-package handlers;
+package server.handlers;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
@@ -8,7 +8,7 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import manager.HTTPTaskManager;
 import manager.TaskManager;
-import tasks.SubTask;
+import tasks.Task;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -16,13 +16,13 @@ import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
-public class SubtaskHandler implements HttpHandler {
+public class TaskHandler implements HttpHandler {
 
     private static final Gson gson = new Gson();
     private static final Charset DEFAULT_CHARSET = StandardCharsets.UTF_8;
     private final TaskManager taskManager;
 
-    public SubtaskHandler(TaskManager taskManager) {
+    public TaskHandler(TaskManager taskManager) {
         this.taskManager = taskManager;
     }
 
@@ -36,23 +36,19 @@ public class SubtaskHandler implements HttpHandler {
 
         switch (method) {
             case "GET":
-                if (path.endsWith("/tasks/subtask")) {
+                if (path.endsWith("/tasks/task")) {
                     exchange.sendResponseHeaders(200, 0);
-                    response = gson.toJson(taskManager.getListSubtasks());
-                } else if (path.contains("/tasks/subtask?id=")) {
-                    exchange.sendResponseHeaders(200, 0);
-                    int id = Integer.parseInt(path.substring(path.indexOf("?id=") + 4));
-                    response = gson.toJson(taskManager.getSubtaskById(id));
-                } else if (path.contains("/tasks/subtask/epic?id=")) {
+                    response = gson.toJson(taskManager.getListTasks());
+                } else if (path.contains("/tasks/task?id=")) {
                     exchange.sendResponseHeaders(200, 0);
                     int id = Integer.parseInt(path.substring(path.indexOf("?id=") + 4));
-                    response = gson.toJson(taskManager.getListSubtasksByEpic(id));
+                    response = gson.toJson(taskManager.getTaskById(id));
                 }
                 break;
             case "POST":
-                if (path.equals("/tasks/subtask")) {
+                if (path.equals("/tasks/task")) {
                     try (InputStream inputStream = exchange.getRequestBody()) {
-                        SubTask subTask = null;
+                        Task task = null;
                         String body = new String(inputStream.readAllBytes(), DEFAULT_CHARSET);
                         JsonElement jsonElement = JsonParser.parseString(body);
                         if (!jsonElement.isJsonObject()) {
@@ -60,11 +56,11 @@ public class SubtaskHandler implements HttpHandler {
                             return;
                         }
                         JsonObject jsonObject = jsonElement.getAsJsonObject();
-                        subTask = (SubTask) taskManager.taskFromJSON(jsonObject);
+                        task = taskManager.taskFromJSON(jsonObject);
 
                         int i = -1;
-                        for (SubTask listSubtask : taskManager.getListSubtasks()) {
-                            if (listSubtask.getId() == subTask.getId()) {
+                        for (Task listTask : taskManager.getPrioritizedTasks()) {
+                            if (listTask.getId() == task.getId()) {
                                 i = 1;
                                 break;
                             }
@@ -72,26 +68,26 @@ public class SubtaskHandler implements HttpHandler {
 
                         if (i > 0) {
                             exchange.sendResponseHeaders(201, 0);
-                            taskManager.updateSubtask(subTask);
-                            response = "Подзадача обновлена.";
+                            taskManager.updateTask(task);
+                            response = "Задача обновлена.";
                         } else {
                             exchange.sendResponseHeaders(201, 0);
-                            ((HTTPTaskManager) taskManager).makeSubtaskWithId(subTask);
-                            response = "Подзадача создана.";
+                            ((HTTPTaskManager) taskManager).makeTaskWithId(task);
+                            response = "Задача создана.";
                         }
                     }
                 }
                 break;
             case "DELETE":
-                if (path.endsWith("/tasks/subtask")) {
+                if (path.endsWith("/tasks/task")) {
                     exchange.sendResponseHeaders(200, 0);
-                    taskManager.deleteAllSubTask();
-                    response = "Все подзадачи удалены.";
-                } else if (path.contains("/tasks/subtask?id=")) {
+                    taskManager.deleteAllTasks();
+                    response = "Все задачи удалены.";
+                } else if (path.contains("/tasks/task?id=")) {
                     exchange.sendResponseHeaders(200, 0);
                     int id = Integer.parseInt(path.substring(path.indexOf("?id=") + 4));
-                    taskManager.deleteSubtaskById(id);
-                    response = "Подзадача с ID = " + id + " удалена.";
+                    taskManager.deleteTaskById(id);
+                    response = "Задача с ID = " + id + " удалена.";
                 }
                 break;
         }
@@ -101,4 +97,3 @@ public class SubtaskHandler implements HttpHandler {
         }
     }
 }
-
