@@ -1,10 +1,11 @@
 package tests;
 
-import Server.HttpTaskServer;
-import Server.KVServer;
+import manager.HTTPTaskManager;
+import org.junit.jupiter.api.BeforeEach;
+import server.HttpTaskServer;
+import server.KVServer;
 import com.google.gson.Gson;
 import manager.Managers;
-import manager.TaskManager;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import tasks.Statuses;
@@ -18,11 +19,10 @@ import java.net.http.HttpResponse;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class HTTPTaskManagerTest {
+public class HTTPTaskManagerTest extends TaskManagerTest<HTTPTaskManager> {
 
     Gson gson = new Gson();
     private static KVServer kvServer;
-    private static TaskManager httpManager;
     private static HttpClient client;
 
     @BeforeAll
@@ -34,14 +34,18 @@ public class HTTPTaskManagerTest {
             System.out.println("Не удалось запустить KV - сервер. Стек ошибки:");
             e.printStackTrace();
         }
-        httpManager = Managers.getDefault();
         client = HttpClient.newHttpClient();
+    }
+
+    @BeforeEach
+    public void beforeEach() {
+        taskManager = (HTTPTaskManager) Managers.getDefault();
     }
 
     @Test
     public void saveAndLoad() throws IOException, InterruptedException {
         Task task = new Task("Сходить в магазин", "Купить капусту", Statuses.IN_PROGRESS, 1);
-        httpManager.makeTask(task);
+        taskManager.makeTask(task);
         HttpTaskServer server = new HttpTaskServer();
 
         HttpRequest request = HttpRequest.newBuilder().uri(URI.create("http://localhost:8080/tasks/")).

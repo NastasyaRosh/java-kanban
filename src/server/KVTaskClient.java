@@ -1,4 +1,4 @@
-package Server;
+package server;
 
 import com.google.gson.*;
 
@@ -10,13 +10,17 @@ import java.net.http.HttpResponse;
 
 public class KVTaskClient {
     private String apiToken;
-    private final HttpClient client;
+    private HttpClient client;
     URI url;
     String key;
 
     public KVTaskClient(URI url) {
-        client = HttpClient.newHttpClient();
         this.url = url;
+        register();
+    }
+
+    private void register() {
+        client = HttpClient.newHttpClient();
         URI urlRegister = URI.create(url + "/register");
         HttpRequest request = HttpRequest.newBuilder().uri(urlRegister).GET().build();
         try {
@@ -33,7 +37,7 @@ public class KVTaskClient {
         URI urlSave = URI.create(url + "/save/" + key + "?API_TOKEN=" + apiToken);
         HttpRequest request = HttpRequest.newBuilder().uri(urlSave).POST(HttpRequest.BodyPublishers.ofString(json)).build();
         try {
-            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            client.send(request, HttpResponse.BodyHandlers.ofString());
         } catch (IOException | InterruptedException e) {
             System.out.println("Во время выполнения запроса на сохранение возникла ошибка.");
         }
@@ -50,17 +54,5 @@ public class KVTaskClient {
             System.out.println("Во время выполнения запроса на загрузку возникла ошибка.");
         }
         return responseLoad;
-    }
-
-    public String getApiToken() {
-        return apiToken;
-    }
-
-    public String getKey() {
-        return key;
-    }
-
-    public void setKey(String key) {
-        this.key = key;
     }
 }
